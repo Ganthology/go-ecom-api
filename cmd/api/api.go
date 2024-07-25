@@ -5,6 +5,9 @@ import (
 	"log"
 	"net/http"
 
+	"github.com/ganthology/go-ecom-api/service/cart"
+	"github.com/ganthology/go-ecom-api/service/order"
+	"github.com/ganthology/go-ecom-api/service/product"
 	"github.com/ganthology/go-ecom-api/service/user"
 	"github.com/gorilla/mux"
 )
@@ -29,6 +32,14 @@ func (s *APIServer) Run() error {
 	userStore := user.NewStore(s.database)
 	userHandler := user.NewHandler(userStore)
 	userHandler.RegisterRoutes(subrouter)
+
+	productStore := product.NewStore(s.database)
+	productHandler := product.NewHandler(productStore)
+	productHandler.RegisterRoutes(subrouter)
+
+	orderStore := order.NewStore(s.database)
+	cartHandler := cart.NewHandler(orderStore, productStore, userStore)
+	cartHandler.RegisterRoutes(subrouter)
 
 	log.Println("Starting server on", s.address)
 
